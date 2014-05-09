@@ -124,6 +124,16 @@ function EventCtrl($scope, $http, $templateCache, $filter, angularFire) {
   });
 }
 
+function ErrReportCtrl($scope, $http, $templateCache, $filter, angularFire){
+  $scope.errReport = function (event) {
+    
+    var email = $scope.errReportEmail;
+  
+  }
+}
+
+
+
 function SubscribeCtrl($scope, $http, $templateCache, $filter, angularFire){
   $scope.addEmail = function (event) {
     if(typeof($scope.email) !== 'undefined' && typeof(event.headline) !== 'undefined'){

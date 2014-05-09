@@ -69,8 +69,9 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="icon-question-sign"></span></a>
               <ul class="dropdown-menu">
                 <li><a class="colorbox icon-star-empty" href="/gdsmw.html?doc=/README_INTRO.txt" target="_blank"> 關於<%= sitename %></a></li>
+                <li><a class="icon-envelope" data-toggle="modal" href="#myDialog" > 錯誤回報</a></li>
                 <li><a class="colorbox icon-plus" href="/gdsmw.html?doc=/README_ADD.txt" target="_blank"> 增加內容</a></li>
-				<li><a class="colorbox icon-warning-sign" href="/gdsmw.html?doc=/README_ERROR.txt" target="_blank"> 錯誤回報</a></li>
+				<li><a class="colorbox icon-warning-sign" href="/gdsmw.html?doc=/README_ERROR.txt" target="_blank"> 錯誤處理</a></li>
 				<li><a class="icon-hand-up" href="http://g0v.tw/" target="_blank"> 關於g0v.tw</a></li>
               </ul>
             </li>
@@ -79,6 +80,31 @@
         </div>
       </div>
     </div>
+
+
+    <div class="modal" id="myDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" ng-controller="ErrReportCtrl">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>{{event.headline}}</h2>
+          </div>
+          <div class="modal-body">
+            <h3>如果你想要訂閱這個事件, 請輸入你的email address</h3>
+            <form ng-submit="errReport()" name="errReportForm">
+              <input type="email" name="errReportEmail" ng-model="errReportEmail" placeholder="請填寫Email" required>
+              <span class="error" ng-show="errReportForm.$error.required">必填</span>
+              <span class="error" ng-show="errReportForm.$error.email">請輸入正確的Email</span>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-small" data-dismiss="modal" ng-disabled="errReportForm.$error.errReportEmail" ng-click="errReport(event)">訂閱</button>
+          </div>
+        </div><!-- /.content-->
+      </div><!-- /.dialog-->
+    </div><!-- /.modal -->
+
+
+
   <% if(template === 'timeline') { %>
     <div class="hidden-element" style="display:none;">
       <div id="embed">
