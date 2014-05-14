@@ -125,14 +125,30 @@ function EventCtrl($scope, $http, $templateCache, $filter, angularFire) {
 }
 
 function ErrReportCtrl($scope, $http, $templateCache, $filter, angularFire){
-  $scope.errReport = function (event) {
-    
-    var email = $scope.errReportEmail;
-  
-  }
+  $scope.errReport = function () {
+    errReportName=$scope.errReportName;
+    errReportEmail=$scope.errReportEmail;
+    errReportTitle=$scope.errReportTitle;
+    errReportContent=$scope.errReportContent;
+    $http({
+      method: 'POST',
+      url: 'errreport',
+      data:{
+        name: errReportName,
+        email: errReportEmail,
+        title: errReportTitle,
+        content: errReportContent
+      },
+      cache: $templateCache
+    })
+    .success(function(data, status) {
+      console.log("send mail request success");
+    })
+    .error(function(data, status) {
+      console.log("send mail request error");
+    });
+  };
 }
-
-
 
 function SubscribeCtrl($scope, $http, $templateCache, $filter, angularFire){
   $scope.addEmail = function (event) {
