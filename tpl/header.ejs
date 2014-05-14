@@ -82,22 +82,29 @@
     </div>
 
 
-    <div class="modal" id="myDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" ng-controller="ErrReportCtrl">
+    <div class="modal" id="myDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" ng-controller="ErrReportCtrl">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h2>{{event.headline}}</h2>
+            <h2>回報錯誤</h2>
           </div>
           <div class="modal-body">
-            <h3>如果你想要訂閱這個事件, 請輸入你的email address</h3>
             <form ng-submit="errReport()" name="errReportForm">
+              <h3>你的稱呼</h3>
+              <input type="text" name="errReportName" ng-model="errReportName" placeholder="請填寫稱呼" required>
+              <h3>你的email address</h3>
               <input type="email" name="errReportEmail" ng-model="errReportEmail" placeholder="請填寫Email" required>
               <span class="error" ng-show="errReportForm.$error.required">必填</span>
               <span class="error" ng-show="errReportForm.$error.email">請輸入正確的Email</span>
+              <h3>主旨</h3>
+              <input type="text" name="errReportTitle" ng-model="errReportTitle" placeholder="請填寫回報錯誤的主旨" required>
+              <span class="error" ng-show="errReportForm.$error.required">必填</span>
+              <h3>內容</h3>
+              <input type="text" name="errReportContent" ng-model="errReportContent" placeholder="請填寫回報錯誤的內容" required>
             </form>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-small" data-dismiss="modal" ng-disabled="errReportForm.$error.errReportEmail" ng-click="errReport(event)">訂閱</button>
+            <button class="btn btn-small" data-dismiss="modal" ng-disabled="errReportForm.$error.errReportEmail" ng-click="errReport()">回報</button>
           </div>
         </div><!-- /.content-->
       </div><!-- /.dialog-->
