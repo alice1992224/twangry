@@ -1,5 +1,7 @@
 var nodemailer = require('nodemailer');
 var ccap = require('ccap');
+var nconf = require('nconf');
+
 var captchaArr = {};
 var counter = 0;
 var errreport = {};
@@ -8,12 +10,13 @@ var issueArr = {};
 var Url = require("url");
 var querystring = require("querystring");
 var OAuth2 = require("oauth").OAuth2;
-var Client = require("node-github");
+var Client = require("github");
 var github = new Client({
     version: "3.0.0"
 });
-var clientId = "8b293614cbf8a4237af2";
-var secret = "48d128b77efffb01b70b000d30a2071f437b8574";
+var clientId = nconf.get('gitAppId');
+var secret = nconf.get('gitAppSecret');
+
 var oauth = new OAuth2(clientId, secret, "https://github.com/", "login/oauth/authorize", "login/oauth/access_token");
 var accessToken = "";
 var issueCount = 0;
@@ -53,25 +56,29 @@ errreport.route = function(tpl, args, ext, callback){
 		});
 		
 		var issueNum = args[2];
-		
-		console.log(issueArr[issueNum]['body']);
-		
 		// send issue
-		github.issues.create(
-            {
-                user: "alice1992224",
-                repo: "twangry",
-                title: issueArr[issueNum]['title'],
-                body: issueArr[issueNum]['body'],
-                labels: [
+		github.issues.create({
+                "user": "alice1992224",
+                "repo": "twangry",
+                "encoding": "utf-8",
+                "title": issueArr[issueNum]['title'],
+                "body": issueArr[issueNum]['body'],
+                "labels": [
                     "Temp!!!"
                 ]
             },
             function(err, issue){
-				console.log("Create issue end");
+                github.issues.deleteLabel(
+                  {
+                      user: "alice1992224",
+                      repo: "twangry",
+                      name: "Temp!!!"
+                  },function(err, issue){
+                    console.log("Create issue end");
+                  }
+                );
             }
         );
-		
 	});
   }
   else{
@@ -83,15 +90,12 @@ errreport.route = function(tpl, args, ext, callback){
       console.log("b:"+captchaArr[remoteIP]);
       if(myPost['captcha']!=captchaArr[remoteIP]){
         args[2]="failed";
-        console.log("failed");
+        callback();
+        return;
       }
       else{
         args[2]="succeeded";
-        console.log("succeeded");
-        console.log(captchaArr);
-        console.log("len: "+captchaArr.size);
         delete captchaArr[remoteIP];
-        console.log(captchaArr);
       }
       
 	  issueArr[issueCount] = {
@@ -99,14 +103,15 @@ errreport.route = function(tpl, args, ext, callback){
 		title: myPost['title'],
 		body: myPost['content']
       };
-	  
+	  var htmlContent="<a href='"+tpl.get('base_url')+"/gitAuth/"+issueCount+"'>送出 issue</a><br/>";
+      console.log(htmlContent);
       // Fill the email
       var message = {
-          from: '\"'+myPost['email']+'\" <'+myPost['email']+'>',
-          to: 'Supertang <super9817020@gmail.com>, Tsuyi <alice1992224@gmail.com>, Sue <WTChi.Sue@gmail.com>',
+          from: '\"'+myPost['name']+'\" <'+myPost['email']+'>',
+          to: nconf.get('mailList'),
           subject: 'g0v政誌 Error Report--'+myPost['title'], 
-          text: myPost['content'],
-		  html: "<a href='http://140.113.235.156:8888/gitAuth/"+issueCount+"'> 送出 issue </a><br/>"
+          //text: myPost['content'],
+		  html: myPost['content'].replace(/\n/g,"<br />")+"<br /><br />按這裡"+htmlContent
       };
 	  
 	  if(issueCount < 100){
@@ -115,9 +120,6 @@ errreport.route = function(tpl, args, ext, callback){
 	  else{
 		issueCount=0;
 	  }
-	  
-		
-	  
 	  // Send mail
       transport.sendMail(message, function(error, response){
           if(error){

@@ -18,10 +18,13 @@
     "api": "w/api.php?action={action}&prop={prop}&format=json&titles=",
     "min_length": 40
   },
-  "base": "/Users/mac/code/homework/test/twangry",
+  "base": "/net/gcs/102/0256001/twangry/",
   "parser": "zhdateparser",
+  "gitAppId":"34119202759c037502ec",
+  "gitAppSecret":"dcda23ff2cab625814d4bb221ef9d73b187eb915",
+  "mailList":"Supertang <super9817020@gmail.com>, Tsuyi <alice1992224@gmail.com>, Sue <WTChi.Sue@gmail.com>, Mars <ymjh11436@gmail.com>",
   "cache": 1,
-  "port": 8080,
+  "port": 8591,
   "proxy": false,
   "debug": false
 }

@@ -18,7 +18,7 @@
     "nconf": "0.6.9",
     "nodemailer": "0.6.3",
 	"ccap": "",
-	"node-github":"",
+	"node-github":"mikedeboer/node-github",
 	"oauth":""
   },
   "license": "GPL",
