@@ -125,11 +125,27 @@ function EventCtrl($scope, $http, $templateCache, $filter, angularFire) {
 }
 
 function ErrReportCtrl($scope, $http, $templateCache, $filter, angularFire){
+  $scope.captchaCheckFailed=false;
+  
+  $scope.isDisabled=function(){
+    report=$scope.errReportForm;
+    return report.errReportName.$error.required || report.errReportName.$error.maxlength ||
+           report.errReportEmail.$error.required || report.errReportEmail.$error.email ||
+           report.errReportTitle.$error.required || report.errReportTitle.$error.maxlength ||
+           report.errReportContent.$error.required || report.errReportContent.$error.maxlength;
+  };
+  
+  $scope.newCaptcha= function () {
+    img = document.getElementById("captcha");
+    img.src="errreport/getCaptcha";
+  };
+  
   $scope.errReport = function () {
     errReportName=$scope.errReportName;
     errReportEmail=$scope.errReportEmail;
     errReportTitle=$scope.errReportTitle;
     errReportContent=$scope.errReportContent;
+    errCaptcha=$scope.errCaptcha;
     $http({
       method: 'POST',
       url: 'errreport',
@@ -137,15 +153,24 @@ function ErrReportCtrl($scope, $http, $templateCache, $filter, angularFire){
         name: errReportName,
         email: errReportEmail,
         title: errReportTitle,
-        content: errReportContent
+        content: errReportContent,
+        captcha: errCaptcha
       },
       cache: $templateCache
     })
     .success(function(data, status) {
       console.log("send mail request success");
+      if(data=="succeeded"){
+        window.location.reload();
+      }
+      else if(data=="failed"){
+        $scope.captchaCheckFailed=true;
+      }
+      else{} // impossible
+      console.log(data);
     })
     .error(function(data, status) {
-      console.log("send mail request error");
+      console.log("send mail request errors");
     });
   };
 }

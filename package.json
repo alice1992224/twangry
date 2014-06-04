@@ -16,7 +16,9 @@
     "mime": "1.2.11",
     "mkdirp": "0.3.5",
     "nconf": "0.6.9",
-    "nodemailer": "0.6.3"
+    "nodemailer": "0.6.3",
+	"ccap": "",
+	"node-github":""
   },
   "license": "GPL",
   "engines": {

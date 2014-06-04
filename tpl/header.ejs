@@ -90,10 +90,10 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h2>回報錯誤</h2>
+            <h2>錯誤回報</h2>
           </div>
           <div class="modal-body">
-            <form ng-submit="errReport()" name="errReportForm">
+            <form name="errReportForm">
               <h3>你的稱呼</h3>
               <input type="text" name="errReportName" ng-model="errReportName" ng-Maxlength="20" placeholder="請填寫稱呼" required>
               <span class="error" ng-show="errReportForm.errReportName.$error.required">必填</span>
@@ -115,15 +115,16 @@
               <span class="error" ng-show="errReportForm.errReportContent.$error.maxlength">字數不得多於400</span>
               
               <h3>驗證碼：</h3>
-              <button class="btn btn-small" data-dismiss="modal" ng-click="test()">重新產生</button>
-              <img style="width:110px; height: 50px; position: relative;  border-style: dotted; border-width: 1px; z-index:999;" src="Checksome.jpg" alt="Check No">
+              <button class="btn btn-small" ng-click="newCaptcha()">重新產生</button>
+              <img id="captcha" style="width:110px; height: 50px; position: relative;  border-style: dotted; border-width: 1px; z-index:999;" src="errreport/getCaptcha" alt="Check No">
               <input type="text" name="errCaptcha" ng-model="errCaptcha" placeholder="請輸入驗證碼" required>
-              
-
+              <span class="error" ng-show="errReportForm.errCaptcha.$error.required && !captchaCheckFailed">請輸入驗證碼</span>
+              <span class="error" ng-show="captchaCheckFailed">驗證碼有誤!</span>
             </form>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-small" data-dismiss="modal" ng-disabled="errReportForm.errReportEmail.$error.required" ng-click="errReport()">回報</button>
+            <!--<button class="btn btn-small"  ng-disabled="errReportForm.errReportEmail.$error.required" ng-click="errReport()">回報</button>-->
+            <button class="btn btn-small" ng-disabled="isDisabled()" ng-click="errReport()">回報</button>
           </div>
         </div><!-- /.content-->
       </div><!-- /.dialog-->
