@@ -1,58 +1,49 @@
 var nodemailer = require('nodemailer');
 var ccap = require('ccap');
 var nconf = require('nconf');
-
-var captchaArr = {};
-var counter = 0;
-var errreport = {};
-var issueArr = {};
-
 var Url = require("url");
 var querystring = require("querystring");
 var OAuth2 = require("oauth").OAuth2;
 var Client = require("github");
-var github = new Client({
-    version: "3.0.0"
-});
-var clientId = nconf.get('gitAppId');
-var secret = nconf.get('gitAppSecret');
+var errreport = {};
 
-var oauth = new OAuth2(clientId, secret, "https://github.com/", "login/oauth/authorize", "login/oauth/access_token");
-var accessToken = "";
+var captchaArr = {};
+var counter = 0;
+var issueArr = {};
 var issueCount = 0;
 
 errreport.route = function(tpl, args, ext, callback){
-  remoteIP=tpl.get('remoteIP');
+  var remoteIP=tpl.get('remoteIP');
   
   if( args[1] == "getCaptcha"){
-    console.log(remoteIP);
+    //console.log(remoteIP);
     var captcha = ccap();
     var ary = captcha.get();
-    //captchaArr[counter] = ary[0];
-    args[2] = ary[1];
+    tpl.set("content",ary[1]);
     console.log(ary[0]);
     counter++;
     remoteIP=tpl.get('remoteIP');
     captchaArr[remoteIP]=ary[0];
+    callback();
   }
   else if(args[1] == "sendIssue"){
-  
 	var url = Url.parse(tpl.get('req_url'));
 	var path = url.pathname;
     var query = querystring.parse(url.query);
-	
-  
+	var github = new Client({
+        version: "3.0.0"
+    });
+    var clientId = nconf.get('gitAppId');
+    var secret = nconf.get('gitAppSecret');
+    var oauth = new OAuth2(clientId, secret, "https://github.com/", "login/oauth/authorize", "login/oauth/access_token");
 	oauth.getOAuthAccessToken(query.code, {}, function (err, access_token, refresh_token) {
 		if (err) {
 			console.log("Auth error!!!!!");
 		}
-		
-		accessToken = access_token;
-		
 		// authenticate github API
 		github.authenticate({
 			type: "oauth",
-			token: accessToken
+			token: access_token
 		});
 		
 		var issueNum = args[2];
@@ -60,7 +51,6 @@ errreport.route = function(tpl, args, ext, callback){
 		github.issues.create({
                 "user": "alice1992224",
                 "repo": "twangry",
-                "encoding": "utf-8",
                 "title": issueArr[issueNum]['title'],
                 "body": issueArr[issueNum]['body'],
                 "labels": [
@@ -75,26 +65,29 @@ errreport.route = function(tpl, args, ext, callback){
                       name: "Temp!!!"
                   },function(err, issue){
                     console.log("Create issue end");
+                    tpl.set("content","redirect");
+                    tpl.set("issuePage","https://github.com/alice1992224/twangry/issues");
+                    callback();
                   }
                 );
             }
         );
+        
 	});
+    
   }
   else{
-      var transport = nodemailer.createTransport("Direct", {debug: true});
+      var transport = nodemailer.createTransport("Direct", {debug: false});
       myPost=tpl.get('post');
       tpl.set('post','');//clear
       myPost=JSON.parse(myPost);
-      console.log("a:"+myPost['captcha']);
-      console.log("b:"+captchaArr[remoteIP]);
       if(myPost['captcha']!=captchaArr[remoteIP]){
-        args[2]="failed";
+        tpl.set("content","failed");
         callback();
         return;
       }
       else{
-        args[2]="succeeded";
+        tpl.set("content","succeeded");
         delete captchaArr[remoteIP];
       }
       
@@ -104,7 +97,7 @@ errreport.route = function(tpl, args, ext, callback){
 		body: myPost['content']
       };
 	  var htmlContent="<a href='"+tpl.get('base_url')+"/gitAuth/"+issueCount+"'>送出 issue</a><br/>";
-      console.log(htmlContent);
+      //console.log(htmlContent);
       // Fill the email
       var message = {
           from: '\"'+myPost['name']+'\" <'+myPost['email']+'>',
@@ -127,12 +120,12 @@ errreport.route = function(tpl, args, ext, callback){
               console.log(error.message);
               return;
           }else{
-              //console.log(response);
-              console.log('Message sent successfully!');
+              console.log('Mail sent successfully!');
           }
       });
+      callback();
   }
-  callback();
+  
 }
 
 module.exports=errreport;
